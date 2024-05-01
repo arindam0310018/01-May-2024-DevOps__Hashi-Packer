@@ -1,0 +1,64 @@
+trigger:
+  none
+
+######################
+# Declare Parameters:-
+######################
+parameters: 
+- name: KVName
+  displayName: Please Provide the Keyvault Name:-
+  type: object
+  default: ampockv
+  values:
+  - ampockv
+
+######################
+#DECLARE VARIABLES:-
+######################
+variables:
+  ServiceConnection: amcloud-cicd-service-connection
+  BuildAgent: windows-latest
+  packerfile: '$(Build.SourcesDirectory)/Packer/am-packer-template-v2.pkr.hcl'
+  envName: NonProd
+
+#########################
+# Declare Build Agents:-
+#########################
+pool:
+  vmImage: $(BuildAgent)
+
+###################
+# Declare Stages:-
+###################
+
+stages:
+
+- stage: BUILD_IMAGE_PACKER 
+  jobs:
+  - job: BUILD_IMAGE_PACKER 
+    displayName: BUILD IMAGE PACKER
+    steps:
+################################        
+# Download Keyvault Secrets:-
+################################
+    - task: AzureKeyVault@2
+      displayName: Fetch all Secrets from Keyvault
+      inputs:
+        azureSubscription: '$(ServiceConnection)'
+        KeyVaultName: '${{ parameters.KVName }}'
+        SecretsFilter: '*'
+        RunAsPreJob: false
+####################################
+# Build Windows Image with Packer:-
+####################################
+    - task: AzureCLI@2
+      displayName: Build Image With Packer
+      inputs:
+        azureSubscription: $(ServiceConnection)
+        scriptType: ps
+        scriptLocation: inlineScript
+        inlineScript: |
+          packer
+          packer plugins install github.com/hashicorp/azure
+          packer build -var "client_id=$(clientId)" -var "client_secret=$(clientsecret)" -var "subscription_id=$(subsId)" -var "tenant_id=$(tenantId)" -on-error=abort -force $(packerfile)
+          
