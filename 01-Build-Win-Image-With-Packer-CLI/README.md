@@ -114,7 +114,7 @@ build {
 | 4. Build Packer:- |
 | --------- |
 
-`.\packer.exe validate C:\Packer\am-packer-template-v1.pkr.hcl
+`.\packer.exe build C:\Packer\am-packer-template-v1.pkr.hcl
 `
 
 | __BELOW FOLLOWS ALL THE TROUBLESHOOTING STEPS:-__ |
