@@ -95,6 +95,7 @@ build {
 | --------- |
 
 | AZURE DEVOPS YAML PIPELINE (azure-pipelines-build-image-with-packer-v1.0.yml):- |
+| --------- |
 
 ```
 trigger:
